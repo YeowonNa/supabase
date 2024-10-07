@@ -24,7 +24,7 @@ export default function Ui() {
       <FileInput />
 
       {/* 이미지 리스트 */}
-      <DropboxImageList />
+      <DropboxImageList searchInput={searchInput} />
     </main>
   );
 }
