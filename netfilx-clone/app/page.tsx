@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Ui from "./ui";
 
 export const metadata: Metadata = {
   title: "TMDBFLEX",
@@ -6,5 +7,9 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <main className="w-full p-2">netfilx</main>;
+  return (
+    <div className="w-full">
+      <Ui />
+    </div>
+  );
 }
