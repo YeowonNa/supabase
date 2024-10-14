@@ -39,3 +39,21 @@ export async function searchMovies(search = "") {
 
   return data;
 }
+
+/**
+ * @returns data
+ * @desc id를 받아서 영화를 가져오는 함수
+ */
+export async function getMovies(id) {
+  const supabase = await createServerSupabaseClient();
+
+  const { data, error } = await supabase
+    .from("movie")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  handleError(error);
+
+  return data;
+}
