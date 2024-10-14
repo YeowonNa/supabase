@@ -27,17 +27,29 @@ export async function getAllMovies() {
  * @returns data
  * @desc 영화 검색 함수
  */
-export async function searchMovies(search = "") {
+export async function searchMovies({ search, page, pageSize }) {
   const supabase = await createServerSupabaseClient();
 
-  const { data, error } = await supabase
+  const { data, count, error } = await supabase
     .from("movie")
     .select("*")
-    .like("title", `%${search}%`);
+    .like("title", `%${search}%`)
+    .range((page - 1) * pageSize, page * pageSize - 1); // stage, end 값
 
-  handleError(error);
+  const hasNextPage = count > page * pageSize;
 
-  return data;
+  if (error) {
+    console.error(error);
+    return {
+      data: [],
+      count: 0,
+      page: null,
+      pageSize: null,
+      error,
+    };
+  }
+
+  return { data, page, pageSize, hasNextPage };
 }
 
 /**
