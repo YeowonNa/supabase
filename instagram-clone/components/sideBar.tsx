@@ -2,8 +2,14 @@
 
 import { Home, Logout, People, Search, Send } from "@mui/icons-material";
 import Link from "next/link";
+import { createBrowserSupabaseClient } from "utils/supabase/client";
 
 export default function SiderBar() {
+  const supabase = createBrowserSupabaseClient();
+  const onClickHandle = async () => {
+    supabase.auth.signOut();
+  };
+
   return (
     <aside className="h-screen p-6 border-r border-gray-300 flex flex-col justify-between">
       {/* home button + perple page ~ chat page */}
@@ -24,7 +30,7 @@ export default function SiderBar() {
 
       {/* logout button */}
       <div>
-        <button onClick={() => console.log("로그아웃")}>
+        <button onClick={onClickHandle}>
           <Logout className="text-2xl text-deep-purple-900" />
         </button>
       </div>
