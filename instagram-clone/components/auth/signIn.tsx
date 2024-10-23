@@ -8,6 +8,18 @@ export default function SignIn({ setView }) {
   const [password, setPassword] = useState("");
   const supabase = createBrowserSupabaseClient();
 
+  const signInWithKakao = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "kakao",
+      options: {
+        redirectTo: process.env.NEXT_PUBLIC_VERCEL_URL
+          ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/auth/callback`
+          : "http://localhost:3000/auth/callback",
+      },
+    });
+    console.log(data);
+  };
+
   const signInMutation = useMutation({
     mutationFn: async () => {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -51,10 +63,17 @@ export default function SignIn({ setView }) {
           loading={signInMutation.isPending}
           disabled={signInMutation.isPending}
           color="light-blue"
-          className="w-full text-md py-1"
+          className="w-full text-md py-1 rounded-md"
         >
-          로그인하기
+          로그인
         </Button>
+
+        <div onClick={() => signInWithKakao()} className="cursor-pointer">
+          <img
+            src={`/images/kakao_login_medium_wide.png`}
+            className="w-full h-9"
+          />
+        </div>
       </div>
 
       <div className="py-4 w-full text-center max-w-lg border border-gray-400 bg-white">
