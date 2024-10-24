@@ -1,4 +1,6 @@
-import LogoutButton from "components/logoutButton";
+import { getUserInfo } from "actions/userInfoAction";
+import Header from "components/header";
+import Mypage from "components/home";
 import { createServerSupabaseClient } from "utils/supabase/server";
 
 export const metadata = {
@@ -9,15 +11,20 @@ export const metadata = {
 export default async function Home() {
   const supabase = await createServerSupabaseClient();
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const userName = user?.email?.split("@")?.[0];
+
+  const userInfo = await getUserInfo(user.id);
+
+  console.log(".>", userInfo);
 
   return (
-    <main className="w-full h-screen flex flex-col gap-2 items-center justify-center">
-      <h1 className="font-bold text-xl">
-        Welcome ! {session?.user?.email?.split("@")?.[0]}
-      </h1>
-      <LogoutButton />
+    <main className="w-full h-screen flex flex-col items-center">
+      <Header userName={userName} profileImg={userInfo.imgurl} />
+      {/* Welcome ! {session?.user?.email?.split("@")?.[0]} */}
+      <Mypage userInfo={userInfo} />
     </main>
   );
 }

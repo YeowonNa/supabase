@@ -1,5 +1,6 @@
 import { Button, Input } from "@material-tailwind/react";
 import { useMutation } from "@tanstack/react-query";
+import { getUserUpsert } from "actions/userInfoAction";
 import { useState } from "react";
 import { createBrowserSupabaseClient } from "utils/supabase/client";
 
@@ -17,7 +18,6 @@ export default function SignIn({ setView }) {
           : "http://localhost:3000/auth/callback",
       },
     });
-    console.log(data);
   };
 
   const signInMutation = useMutation({
@@ -33,6 +33,9 @@ export default function SignIn({ setView }) {
 
       if (data) {
         console.log(data);
+
+        const { user } = data;
+        getUserUpsert(user);
       }
     },
   });

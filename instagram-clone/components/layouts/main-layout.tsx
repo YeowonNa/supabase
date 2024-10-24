@@ -7,7 +7,6 @@ export default async function MainLayout({ children }) {
         <SiderBar />
         {children}
       </main>
-      ;
     </>
   );
 }
