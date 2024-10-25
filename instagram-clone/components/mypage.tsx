@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import { profileImgState } from "utils/supabase/recoil/atoms";
 import getImageUrl from "utils/supabase/storage";
+import LogoutButton from "./logoutButton";
+import { getUserInfo } from "actions/userInfoAction";
 
 export default function Mypage({ userInfo, isKakao }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -40,7 +42,8 @@ export default function Mypage({ userInfo, isKakao }) {
       await uploadToTable(publicUrl, userInfo.id);
 
       // 상태 업데이트로 이미지 변경
-      setProfileImg(publicUrl);
+      const updatedUserInfo = await getUserInfo(userInfo.id);
+      setProfileImg(updatedUserInfo.imgurl);
     },
   });
 
@@ -80,7 +83,9 @@ export default function Mypage({ userInfo, isKakao }) {
           <p className="text-xs">{userInfo?.email}</p>
         </div>
       </div>
-      <div className="w-full h-60 bg-white"></div>
+      <div className="w-full h-60 bg-white">
+        <LogoutButton />
+      </div>
     </div>
   );
 }

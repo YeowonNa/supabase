@@ -1,6 +1,6 @@
 import { Button, Input } from "@material-tailwind/react";
 import { useMutation } from "@tanstack/react-query";
-import { getUserUpsert } from "actions/userInfoAction";
+import { getUserInfo, getUserUpsert } from "actions/userInfoAction";
 import { useState } from "react";
 import { createBrowserSupabaseClient } from "utils/supabase/client";
 
@@ -32,10 +32,17 @@ export default function SignIn({ setView }) {
       }
 
       if (data) {
-        console.log(data);
-
         const { user } = data;
-        getUserUpsert(user);
+        // getUserInfo를 통해 현재 imgurl을 가져와서 설정
+        const currentUserInfo = await getUserInfo(user.id);
+        const imgurl =
+          currentUserInfo.imgurl || user.user_metadata.avatar_url || null;
+
+        // 유저 정보를 업데이트할 때 imgurl을 포함하여 저장
+        await getUserUpsert({
+          ...user,
+          user_metadata: { ...user.user_metadata, avatar_url: imgurl },
+        });
       }
     },
   });

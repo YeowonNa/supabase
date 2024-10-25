@@ -19,7 +19,7 @@ export default async function Home() {
   const isKakao = user?.app_metadata.provider === "kakao" ? true : false;
   const userName = isKakao ? kakao : email;
 
-  const userInfo = isKakao ? user : await getUserInfo(user.id);
+  const userInfo = isKakao ? user : await getUserInfo(user?.id);
 
   return (
     <main className="w-full h-screen flex flex-col items-center">
