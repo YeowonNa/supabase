@@ -1,15 +1,25 @@
 "use client";
 
 import { AccountCircle } from "@mui/icons-material";
+import { useRecoilValue } from "recoil";
+import { profileImgState } from "utils/supabase/recoil/atoms";
 
-export default function Header({ userName, profileImg }) {
+export default function Header({ userName, isKakao }) {
+  const profileImg = useRecoilValue(profileImgState);
+
   return (
     <header className="w-full bg-white border-b border-solid border-gray-100 justify-start p-4">
       <div className="flex items-center justify-end gap-1 pr-4">
-        {profileImg ? (
+        {isKakao ? (
+          profileImg ? (
+            <img src={profileImg} className="w-10 h-10 rounded-full" />
+          ) : (
+            <AccountCircle className="text-gray-200 w-10 h-10" />
+          )
+        ) : profileImg ? (
           <img src={profileImg} className="w-10 h-10 rounded-full" />
         ) : (
-          <AccountCircle />
+          <AccountCircle className="text-gray-200 w-10 h-10" />
         )}
         <strong className="font-bold text-lg">{userName}</strong>님
       </div>

@@ -9,3 +9,8 @@ export const selectedIndexState = atom({
   key: "selectedIndexState",
   default: null,
 });
+
+export const profileImgState = atom({
+  key: "profileImgState",
+  default: "/images/defaultProfile.png",
+});

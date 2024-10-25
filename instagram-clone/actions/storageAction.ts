@@ -35,16 +35,25 @@ export async function upLoadFile(formData: FormData) {
  * @desc userProfile 테이블에 imgurl 업데이트
  */
 export async function uploadToTable(url: string, userId: string) {
-  const supabase = await createServerSupabaseClient();
-  const { error: updateError } = await supabase
-    .from("userProfile")
-    .update({ imgurl: url }) // imgurl 필드에 URL 저장
-    .eq("id", userId); // 현재 로그인된 유저의 id로 업데이트
+  try {
+    const supabase = await createServerSupabaseClient(); // 서버용 클라이언트
+    const { error: updateError } = await supabase
+      .from("userProfile")
+      .update({ imgurl: url }) // imgurl 필드에 URL 저장
+      .eq("id", userId); // 현재 로그인된 유저의 id로 업데이트
 
-  if (updateError) {
-    alert("Error updating user profile: " + updateError.message);
-  } else {
-    alert("Profile updated successfully with new image URL!");
+    if (updateError) {
+      console.error("Error updating user profile:", updateError.message);
+      throw new Error("Failed to update user profile.");
+    }
+
+    console.log("Profile updated successfully with new image URL!");
+  } catch (err) {
+    console.error(
+      "An unexpected error occurred during profile update:",
+      err.message
+    );
+    throw err; // 클라이언트로 에러 전달
   }
 }
 

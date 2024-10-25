@@ -1,6 +1,6 @@
 import { getUserInfo } from "actions/userInfoAction";
 import Header from "components/header";
-import Mypage from "components/home";
+import Mypage from "components/mypage";
 import { createServerSupabaseClient } from "utils/supabase/server";
 
 export const metadata = {
@@ -14,17 +14,17 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const userName = user?.email?.split("@")?.[0];
+  const email = user?.email?.split("@")?.[0];
+  const kakao = user?.user_metadata.full_name;
+  const isKakao = user?.app_metadata.provider === "kakao" ? true : false;
+  const userName = isKakao ? kakao : email;
 
-  const userInfo = await getUserInfo(user.id);
-
-  console.log(".>", userInfo);
+  const userInfo = isKakao ? user : await getUserInfo(user.id);
 
   return (
     <main className="w-full h-screen flex flex-col items-center">
-      <Header userName={userName} profileImg={userInfo.imgurl} />
-      {/* Welcome ! {session?.user?.email?.split("@")?.[0]} */}
-      <Mypage userInfo={userInfo} />
+      <Header userName={userName} isKakao={isKakao} />
+      <Mypage userInfo={userInfo} isKakao={isKakao} />
     </main>
   );
 }
