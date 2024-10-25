@@ -11,7 +11,7 @@ export default function SiderBar() {
   };
 
   return (
-    <aside className="h-screen p-6 border-r border-gray-300 flex flex-col justify-between">
+    <aside className="relative h-screen bg-white p-6 border-r border-gray-300 flex flex-col justify-between z-10">
       {/* home button + perple page ~ chat page */}
       <div className="flex flex-col gap-4">
         <Link href="/">

@@ -62,7 +62,7 @@ export default function Mypage({ userInfo, isKakao }) {
 
   return (
     <div className="w-full h-screen bg-blue-gray-50 flex px-10 py-8">
-      <div className="w-1/4 h-60 bg-red-50 flex items-center justify-center">
+      <div className="w-1/3 h-60 bg-red-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           {!isKakao && (
             <input
@@ -84,7 +84,14 @@ export default function Mypage({ userInfo, isKakao }) {
         </div>
       </div>
       <div className="w-full h-60 bg-white">
-        <LogoutButton />
+        <div className="m-5">
+          <h1 className="text-xl font-bold pb-2">상태메시지</h1>
+          <input
+            className="w-full h-10 border border-solid border-gray-200"
+            placeholder="상태메시지를 입력해주세요."
+            type="text"
+          />
+        </div>
       </div>
     </div>
   );

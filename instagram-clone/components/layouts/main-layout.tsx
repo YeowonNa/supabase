@@ -1,3 +1,4 @@
+import Footer from "components/footer";
 import SiderBar from "components/sideBar";
 
 export default async function MainLayout({ children }) {
@@ -6,6 +7,7 @@ export default async function MainLayout({ children }) {
       <main className="w-full h-screen flex items-center justify-center">
         <SiderBar />
         {children}
+        <Footer />
       </main>
     </>
   );
