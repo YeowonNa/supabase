@@ -2,6 +2,7 @@
 
 import { Button, Input } from "@material-tailwind/react";
 import { useMutation } from "@tanstack/react-query";
+import { getUserInfo, getUserUpsert } from "actions/userInfoAction";
 import { useState } from "react";
 import { createBrowserSupabaseClient } from "utils/supabase/client";
 
@@ -24,6 +25,14 @@ export default function SignUp({ setView }) {
       });
 
       if (data) {
+        const { user } = data;
+
+        // // 현재 유저의 정보를 가져오기 위해 getUserInfo 호출
+        // const currentUserInfo = await getUserInfo(user.id);
+        // console.log("currentUserInfo", currentUserInfo);
+
+        // const imgurl = currentUserInfo?.imgurl || null;
+        // await getUserUpsert(user, imgurl, currentUserInfo.username);
         setConfirmationRequired(true);
       }
       if (error) {

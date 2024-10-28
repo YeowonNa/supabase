@@ -89,7 +89,7 @@ export default function Mypage({ userInfo, isKakao }) {
   const renderIcon = (profileImg: string) => {
     if (profileImg === "/images/defaultProfile.png") {
       return (
-        <div className="absolute right-6 -top-1 rounded-full border border-solid border-gray-100 bg-gray-100 w-7 h-7 flex items-center justify-center cursor-pointer">
+        <div className="absolute top-0 right-0 rounded-full border border-solid border-gray-100 bg-gray-100 w-7 h-7 flex items-center justify-center cursor-pointer">
           <i className="fas fa-camera" />
         </div>
       );
@@ -97,7 +97,7 @@ export default function Mypage({ userInfo, isKakao }) {
       const fileName = userInfo?.imgurl?.split("/").pop() || "";
       return (
         <div
-          className="absolute right-6 -top-1 rounded-full border border-solid border-gray-100 bg-gray-100 w-7 h-7 flex items-center justify-center cursor-pointer"
+          className="absolute top-0 right-0 rounded-full border border-solid border-gray-100 bg-gray-100 w-7 h-7 flex items-center justify-center cursor-pointer"
           onClick={() => deleteFileMutation.mutate(fileName)}
         >
           <i className="fas fa-trash text-red-600" />
@@ -139,29 +139,29 @@ export default function Mypage({ userInfo, isKakao }) {
   return (
     <div className="w-full h-screen bg-blue-gray-50 flex px-10 py-8 items-center justify-center">
       <div className="w-1/3 h-60 flex flex-col">
-        <div className="flex flex-col items-center gap-3 relative">
-          {!isKakao && (
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleChange}
-              className="hidden"
+        <div className="flex flex-col items-center gap-3">
+          <div className="relative">
+            {!isKakao && (
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleChange}
+                className="hidden"
+              />
+            )}
+            <button
+              onClick={handleClick}
+              type="button"
+              className={`w-24 h-24 rounded-full bg-center bg-no-repeat bg-cover ${
+                isKakao ? "cursor-default" : "cursor-pointer"
+              }`}
+              style={{
+                backgroundImage: `url(${profileImg})`,
+              }}
             />
-          )}
 
-          <button
-            onClick={handleClick}
-            type="button"
-            className={`w-24 h-24 rounded-full bg-center bg-no-repeat bg-cover ${
-              isKakao ? "cursor-default" : "cursor-pointer"
-            }`}
-            style={{
-              backgroundImage: `url(${profileImg})`,
-            }}
-          />
-
-          {!isKakao && renderIcon(profileImg)}
-
+            {!isKakao && renderIcon(profileImg)}
+          </div>
           <p className="text-xs">{userInfo?.email}</p>
         </div>
         <div className="flex flex-col items-center mt-3 gap-2">

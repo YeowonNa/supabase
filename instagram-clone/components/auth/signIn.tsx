@@ -29,20 +29,18 @@ export default function SignIn({ setView }) {
 
       if (error) {
         alert(error);
+        return;
       }
 
       if (data) {
         const { user } = data;
-        // getUserInfo를 통해 현재 imgurl을 가져와서 설정
-        const currentUserInfo = await getUserInfo(user.id);
-        const imgurl =
-          currentUserInfo.imgurl || user.user_metadata.avatar_url || null;
 
-        // 유저 정보를 업데이트할 때 imgurl을 포함하여 저장
-        await getUserUpsert({
-          ...user,
-          user_metadata: { ...user.user_metadata, avatar_url: imgurl },
-        });
+        // 현재 유저의 정보를 가져오기 위해 getUserInfo 호출
+        const currentUserInfo = await getUserInfo(user.id);
+        console.log("currentUserInfo", currentUserInfo);
+
+        const imgurl = currentUserInfo?.imgurl || null;
+        await getUserUpsert(user, imgurl, currentUserInfo.username);
       }
     },
   });

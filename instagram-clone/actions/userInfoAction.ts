@@ -6,13 +6,13 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // 이메일 로그인 시 유저테이블에 유저정보 업데이트
-export async function getUserUpsert(user) {
+export async function getUserUpsert(user, imgurl, username) {
+  console.log("Updating user profile:", user); // 로그 추가
   const { error: insertError } = await supabase.from("userProfile").upsert({
     id: user.id, // 유저의 고유 id를 사용
     email: user.email, // 유저의 이메일
-    username: user.username,
-    statemessage: user.statemessage,
-    imgurl: user.user_metadata.avatar_url || null, // avatar_url은 선택 사항
+    username: user.user_metadata.full_name || username, // full_name은 선택 사항
+    imgurl: imgurl || null, // avatar_url은 선택 사항
   });
 
   if (insertError) {
@@ -23,7 +23,7 @@ export async function getUserUpsert(user) {
 }
 
 // 유저프로필 데이터 가져오기
-export async function getUserInfo(id) {
+export async function getUserInfo(id: string) {
   const { data, error } = await supabase
     .from("userProfile")
     .select("*")
@@ -31,7 +31,7 @@ export async function getUserInfo(id) {
     .maybeSingle();
 
   if (error) {
-    console.log(error);
+    console.log("error > ", error);
   }
 
   return data;
