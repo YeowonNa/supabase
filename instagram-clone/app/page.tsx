@@ -17,9 +17,10 @@ export default async function Home() {
   const email = user?.email?.split("@")?.[0];
   const kakao = user?.user_metadata.full_name;
   const isKakao = user?.app_metadata.provider === "kakao" ? true : false;
-  const userName = isKakao ? kakao : email;
-
   const userInfo = isKakao ? user : await getUserInfo(user?.id);
+  const name = userInfo?.username;
+
+  const userName = isKakao ? kakao : name || email;
 
   return (
     <main className="w-full h-screen flex flex-col items-center">

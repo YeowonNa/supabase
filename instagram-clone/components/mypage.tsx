@@ -1,17 +1,24 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { deleteFiles, upLoadFile, uploadToTable } from "actions/storageAction";
-import { useEffect, useRef, useState } from "react";
+import { deleteFiles, upLoadFile } from "actions/storageAction";
+import React, { useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
-import { profileImgState } from "utils/supabase/recoil/atoms";
+import {
+  profileImgState,
+  profilestateMessage,
+  profileUserName,
+} from "utils/supabase/recoil/atoms";
 import getImageUrl from "utils/supabase/storage";
-import { getUserInfo } from "actions/userInfoAction";
+import { getUserInfo, updateUserProfile } from "actions/userInfoAction";
 import { queryClient } from "config/ReactQueryClientProvider";
+import { Button } from "@material-tailwind/react";
 
 export default function Mypage({ userInfo, isKakao }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [profileImg, setProfileImg] = useRecoilState(profileImgState);
+  const [userName, setUserName] = useRecoilState(profileUserName);
+  const [stateMessage, setStateMessage] = useRecoilState(profilestateMessage);
 
   useEffect(() => {
     const initialImg =
@@ -39,7 +46,10 @@ export default function Mypage({ userInfo, isKakao }) {
       const publicUrl = getImageUrl(file.name);
 
       // userProfile 테이블에 imgurl 업데이트
-      await uploadToTable(publicUrl, userInfo.id);
+      await updateUserProfile({
+        id: userInfo.id,
+        imgurl: publicUrl,
+      });
 
       // 상태 업데이트로 이미지 변경
       const updatedUserInfo = await getUserInfo(userInfo.id);
@@ -55,7 +65,10 @@ export default function Mypage({ userInfo, isKakao }) {
         queryKey: ["images"],
       });
 
-      await uploadToTable(null, userInfo.id);
+      await updateUserProfile({
+        id: userInfo.id,
+        imgurl: null,
+      });
       setProfileImg("/images/defaultProfile.png");
     },
   });
@@ -73,9 +86,59 @@ export default function Mypage({ userInfo, isKakao }) {
     }
   };
 
+  const renderIcon = (profileImg: string) => {
+    if (profileImg === "/images/defaultProfile.png") {
+      return (
+        <div className="absolute right-6 -top-1 rounded-full border border-solid border-gray-100 bg-gray-100 w-7 h-7 flex items-center justify-center cursor-pointer">
+          <i className="fas fa-camera" />
+        </div>
+      );
+    } else {
+      const fileName = userInfo?.imgurl?.split("/").pop() || "";
+      return (
+        <div
+          className="absolute right-6 -top-1 rounded-full border border-solid border-gray-100 bg-gray-100 w-7 h-7 flex items-center justify-center cursor-pointer"
+          onClick={() => deleteFileMutation.mutate(fileName)}
+        >
+          <i className="fas fa-trash text-red-600" />
+        </div>
+      );
+    }
+  };
+
+  const handleUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserName(e.target.value);
+  };
+
+  const handleStateMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setStateMessage(e.target.value);
+  };
+
+  const handleUpdate = async () => {
+    if (!isKakao) {
+      try {
+        const updatedUserProfile = {
+          id: userInfo?.id,
+          username: userName,
+          statemessage: stateMessage,
+        };
+        await updateUserProfile(updatedUserProfile);
+
+        // userProfile 상태 업데이트
+        const updatedUserInfo = await getUserInfo(userInfo.id);
+        setUserName(updatedUserInfo.username);
+        setStateMessage(updatedUserInfo.statemessage);
+      } catch (error) {
+        alert("프로필 업데이트 실패. 다시 시도해주세요.");
+      }
+    } else {
+      alert("카카오톡 내에서 변경해주세요.");
+    }
+  };
+
   return (
-    <div className="w-full h-screen bg-blue-gray-50 flex px-10 py-8">
-      <div className="w-1/3 h-60 bg-red-50 flex items-center justify-center">
+    <div className="w-full h-screen bg-blue-gray-50 flex px-10 py-8 items-center justify-center">
+      <div className="w-1/3 h-60 flex flex-col">
         <div className="flex flex-col items-center gap-3 relative">
           {!isKakao && (
             <input
@@ -89,35 +152,39 @@ export default function Mypage({ userInfo, isKakao }) {
           <button
             onClick={handleClick}
             type="button"
-            className="w-24 h-24 rounded-full bg-center bg-no-repeat bg-cover"
+            className={`w-24 h-24 rounded-full bg-center bg-no-repeat bg-cover ${
+              isKakao ? "cursor-default" : "cursor-pointer"
+            }`}
             style={{
               backgroundImage: `url(${profileImg})`,
             }}
           />
 
-          {profileImg !== "/images/defaultProfile.png" && !isKakao && (
-            <div
-              className="absolute right-4 rounded-full border border-solid border-gray-100 w-7 h-7 flex items-center justify-center cursor-pointer"
-              onClick={() => {
-                const fileName = userInfo.imgurl.split("/").pop() || "";
-                deleteFileMutation.mutate(fileName);
-              }}
-            >
-              <i className="fas fa-trash text-red-600" />
-            </div>
-          )}
+          {!isKakao && renderIcon(profileImg)}
+
           <p className="text-xs">{userInfo?.email}</p>
         </div>
-      </div>
-      <div className="w-full h-60 bg-white">
-        <div className="m-5">
-          <h1 className="text-xl font-bold pb-2">상태메시지</h1>
+        <div className="flex flex-col items-center mt-3 gap-2">
           <input
-            className="w-full h-10 border border-solid border-gray-200"
-            placeholder="상태메시지를 입력해주세요."
             type="text"
+            value={userName}
+            onChange={handleUserNameChange}
+            placeholder={userInfo?.username ? userInfo.username : "이름"}
+            className="border-b-gray-300 border-b text-center"
+          />
+          <input
+            type="text"
+            value={stateMessage}
+            onChange={handleStateMessageChange}
+            placeholder={
+              userInfo?.statemessage ? userInfo?.statemessage : "상태메시지"
+            }
+            className="border-b-gray-300 border-b text-center"
           />
         </div>
+        <Button className="mt-3" onClick={handleUpdate}>
+          저장
+        </Button>
       </div>
     </div>
   );

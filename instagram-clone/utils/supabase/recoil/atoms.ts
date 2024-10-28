@@ -14,3 +14,13 @@ export const profileImgState = atom({
   key: "profileImgState",
   default: "/images/defaultProfile.png",
 });
+
+export const profileUserName = atom({
+  key: "profileUserName",
+  default: "",
+});
+
+export const profilestateMessage = atom({
+  key: "profilestateMessage",
+  default: "",
+});

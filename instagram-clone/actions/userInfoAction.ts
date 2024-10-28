@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { UserProfile } from "type/userInfo";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -9,7 +10,8 @@ export async function getUserUpsert(user) {
   const { error: insertError } = await supabase.from("userProfile").upsert({
     id: user.id, // 유저의 고유 id를 사용
     email: user.email, // 유저의 이메일
-    username: user.user_metadata.full_name || null, // full_name은 선택 사항
+    username: user.username,
+    statemessage: user.statemessage,
     imgurl: user.user_metadata.avatar_url || null, // avatar_url은 선택 사항
   });
 
@@ -33,4 +35,30 @@ export async function getUserInfo(id) {
   }
 
   return data;
+}
+
+/**
+ * @param formData
+ * @desc userProfile 테이블에 imgurl 업데이트
+ */
+export async function updateUserProfile(user: UserProfile) {
+  try {
+    const { error: updateError } = await supabase
+      .from("userProfile")
+      .update({ ...user, created_at: new Date().toISOString() }) // imgurl 필드에 URL 저장
+      .eq("id", user.id); // 현재 로그인된 유저의 id로 업데이트
+
+    if (updateError) {
+      console.error("Error updating user profile:", updateError.message);
+      throw new Error("Failed to update user profile.");
+    }
+
+    console.log("Profile updated successfully with new image URL!");
+  } catch (err) {
+    console.error(
+      "An unexpected error occurred during profile update:",
+      err.message
+    );
+    throw err; // 클라이언트로 에러 전달
+  }
 }
