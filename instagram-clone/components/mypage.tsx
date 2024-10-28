@@ -1,13 +1,13 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { upLoadFile, uploadToTable } from "actions/storageAction";
+import { deleteFiles, upLoadFile, uploadToTable } from "actions/storageAction";
 import { useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import { profileImgState } from "utils/supabase/recoil/atoms";
 import getImageUrl from "utils/supabase/storage";
-import LogoutButton from "./logoutButton";
 import { getUserInfo } from "actions/userInfoAction";
+import { queryClient } from "config/ReactQueryClientProvider";
 
 export default function Mypage({ userInfo, isKakao }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -47,6 +47,19 @@ export default function Mypage({ userInfo, isKakao }) {
     },
   });
 
+  // 파일 삭제
+  const deleteFileMutation = useMutation({
+    mutationFn: deleteFiles,
+    onSuccess: async () => {
+      queryClient.invalidateQueries({
+        queryKey: ["images"],
+      });
+
+      await uploadToTable(null, userInfo.id);
+      setProfileImg("/images/defaultProfile.png");
+    },
+  });
+
   const handleChange = async (e) => {
     e.preventDefault();
     const file = e.target.files?.[0]; // 선택한 파일을 가져옴
@@ -63,7 +76,7 @@ export default function Mypage({ userInfo, isKakao }) {
   return (
     <div className="w-full h-screen bg-blue-gray-50 flex px-10 py-8">
       <div className="w-1/3 h-60 bg-red-50 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-3 relative">
           {!isKakao && (
             <input
               type="file"
@@ -72,6 +85,7 @@ export default function Mypage({ userInfo, isKakao }) {
               className="hidden"
             />
           )}
+
           <button
             onClick={handleClick}
             type="button"
@@ -80,6 +94,18 @@ export default function Mypage({ userInfo, isKakao }) {
               backgroundImage: `url(${profileImg})`,
             }}
           />
+
+          {profileImg !== "/images/defaultProfile.png" && !isKakao && (
+            <div
+              className="absolute right-4 rounded-full border border-solid border-gray-100 w-7 h-7 flex items-center justify-center cursor-pointer"
+              onClick={() => {
+                const fileName = userInfo.imgurl.split("/").pop() || "";
+                deleteFileMutation.mutate(fileName);
+              }}
+            >
+              <i className="fas fa-trash text-red-600" />
+            </div>
+          )}
           <p className="text-xs">{userInfo?.email}</p>
         </div>
       </div>

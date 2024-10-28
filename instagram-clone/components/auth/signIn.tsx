@@ -47,6 +47,16 @@ export default function SignIn({ setView }) {
     },
   });
 
+  const handleClick = () => {
+    signInMutation.mutate();
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleClick();
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="pt-10 pb-6 px-10 w-full flex flex-col items-center justify-center max-w-lg border border-gray-400 bg-white gap-2">
@@ -65,11 +75,10 @@ export default function SignIn({ setView }) {
           label="password"
           type="password"
           className="2-full rounded-sm"
+          onKeyDown={(e) => handleKeyDown(e)}
         />
         <Button
-          onClick={() => {
-            signInMutation.mutate();
-          }}
+          onClick={handleClick}
           loading={signInMutation.isPending}
           disabled={signInMutation.isPending}
           color="light-blue"
