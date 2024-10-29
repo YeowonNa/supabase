@@ -20,9 +20,7 @@ export default function SignUp({ setView }) {
         email,
         password,
         options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_API_HOST
-            ? `https://${process.env.NEXT_PUBLIC_API_HOST}/signup/confirm`
-            : "http://localhost:3000/signup/confirm", // 회원가입 완료 후 넘어오는 url
+          emailRedirectTo: `https://${process.env.NEXT_PUBLIC_API_HOST}/signup/confirm`,
         },
       });
 

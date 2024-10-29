@@ -13,9 +13,7 @@ export default function SignIn({ setView }) {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "kakao",
       options: {
-        redirectTo: process.env.NEXT_PUBLIC_API_HOST
-          ? `https://${process.env.NEXT_PUBLIC_API_HOST}/auth/callback`
-          : "http://localhost:3000/auth/callback",
+        redirectTo: `https://${process.env.NEXT_PUBLIC_API_HOST}/auth/callback`,
       },
     });
     if (error) {
