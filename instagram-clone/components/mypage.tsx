@@ -3,8 +3,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { deleteFiles, upLoadFile } from "actions/storageAction";
 import React, { useEffect, useRef, useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { profileImgState, userState } from "utils/supabase/recoil/atoms";
+import { useRecoilState } from "recoil";
+import { profileImgState } from "utils/supabase/recoil/atoms";
 import getImageUrl from "utils/supabase/storage";
 import { getUserInfo, updateUserProfile } from "actions/userInfoAction";
 import { queryClient } from "config/ReactQueryClientProvider";
@@ -15,6 +15,7 @@ export default function Mypage({ userInfo, isKakao }) {
   const [profileImg, setProfileImg] = useRecoilState(profileImgState);
   const [userName, setUserName] = useState("");
   const [stateMessage, setStateMessage] = useState("");
+  console.log(userInfo);
 
   useEffect(() => {
     const initialImg =
@@ -110,25 +111,31 @@ export default function Mypage({ userInfo, isKakao }) {
     setStateMessage(e.target.value);
   };
 
-  const handleUpdate = async () => {
-    if (!isKakao) {
-      try {
-        const updatedUserProfile = {
-          id: userInfo?.id,
-          username: userName,
-          statemessage: stateMessage,
-        };
-        await updateUserProfile(updatedUserProfile);
+  const handleUpdateMutation = useMutation({
+    mutationFn: async () => {
+      const updatedUserProfile = {
+        id: userInfo?.id,
+        username: userName,
+        statemessage: stateMessage,
+      };
+      await updateUserProfile(updatedUserProfile);
 
-        // userProfile 상태 업데이트
-        const updatedUserInfo = await getUserInfo(userInfo.id);
-        setUserName(updatedUserInfo.username);
-        setStateMessage(updatedUserInfo.statemessage);
-      } catch (error) {
-        alert("프로필 업데이트 실패. 다시 시도해주세요.");
-      }
-    } else {
-      alert("카카오톡 내에서 변경해주세요.");
+      // 업데이트된 프로필 정보를 다시 가져옴
+      const updatedUserInfo = await getUserInfo(userInfo.id);
+      return updatedUserInfo;
+    },
+    onSuccess: (updatedUserInfo) => {
+      setUserName(updatedUserInfo.username);
+      setStateMessage(updatedUserInfo.statemessage);
+    },
+    onError: () => {
+      alert("프로필 업데이트에 실패했습니다.");
+    },
+  });
+
+  const handleUpdate = () => {
+    if (userName.trim() !== "" || stateMessage.trim() !== "") {
+      handleUpdateMutation.mutate();
     }
   };
 
@@ -178,7 +185,12 @@ export default function Mypage({ userInfo, isKakao }) {
             className="border-b-gray-300 border-b text-center"
           />
         </div>
-        <Button className="mt-3" onClick={handleUpdate}>
+        <Button
+          className="mt-3 flex items-center justify-center"
+          onClick={handleUpdate}
+          loading={handleUpdateMutation.isPending}
+          disabled={handleUpdateMutation.isPending}
+        >
           저장
         </Button>
       </div>

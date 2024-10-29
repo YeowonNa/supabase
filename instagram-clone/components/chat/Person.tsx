@@ -2,31 +2,26 @@
 
 import TimeAgo from "javascript-time-ago";
 import ko from "javascript-time-ago/locale/ko";
-import { getRandomImage } from "utils/supabase/randomImage";
 
 TimeAgo.addDefaultLocale(ko);
 
 const timeAgo = new TimeAgo("ko-KR");
 
 interface Props {
-  index: number;
   name: string;
   onLineAt: string;
   isActive: boolean;
   onChatScreen: boolean;
   onClick?: () => void;
   profileImg?: string;
-  userId?: string;
 }
 export default function Person({
-  index,
   name,
   onLineAt,
   isActive = false,
   onChatScreen = false,
   onClick = null,
   profileImg,
-  userId,
 }: Props) {
   return (
     <div

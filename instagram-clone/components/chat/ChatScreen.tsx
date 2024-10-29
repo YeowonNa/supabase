@@ -1,17 +1,16 @@
 "use client";
 
-import { Button, select, Spinner } from "@material-tailwind/react";
+import { Spinner } from "@material-tailwind/react";
 import Person from "./Person";
 import Message from "./Message";
 import { useRecoilValue } from "recoil";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { createBrowserSupabaseClient } from "utils/supabase/client";
 import {
   presenceState,
   selectedUserIdState,
-  selectedUserIndexState,
 } from "utils/supabase/recoil/atoms";
 import { formatDateTime } from "utils/formattedDateTime";
 import { getUserInfo } from "actions/userInfoAction";
@@ -70,10 +69,13 @@ export async function getAllMessages({ chatUserId }) {
 
 export default function ChatScreen({}) {
   const selectedUserId = useRecoilValue(selectedUserIdState);
-  const selectedUserIndex = useRecoilValue(selectedUserIndexState);
   const [message, setMessage] = useState("");
   const supabase = createBrowserSupabaseClient();
   const presence = useRecoilValue(presenceState);
+  const chatContainerRef = useRef(null);
+
+  let lastOnLineAt = null; // 마지막 onLineAt을 저장할 변수
+  let lastIsFromMe = null; // 마지막 isFromMe 상태를 저장할 변수
 
   const selectedUserQuery = useQuery({
     queryKey: ["user", selectedUserId],
@@ -127,8 +129,17 @@ export default function ChatScreen({}) {
     };
   }, []);
 
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [getAllMessagesQuery.data]);
+
   const handleClick = () => {
-    sendMessageMutation.mutate();
+    if (message.trim() !== "") {
+      sendMessageMutation.mutate();
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -142,17 +153,18 @@ export default function ChatScreen({}) {
     <div className="w-full h-screen flex flex-col">
       {/* Active 유저 영역 */}
       <Person
-        index={selectedUserIndex}
         isActive={false}
         name={data?.username ? data.username : data?.email?.split("@")?.[0]}
         onChatScreen={true}
-        onLineAt={presence?.[selectedUserId]?.[0]?.onlineAt}
-        userId={data?.id}
+        onLineAt={presence?.[selectedUserId]?.[0]?.onLineAt}
         profileImg={data?.imgurl ? data.imgurl : "/images/defaultProfile.png"}
       />
 
       {/* 채팅 영역 */}
-      <div className="w-full overflow-y-scroll flex-1 flex flex-col p-4 gap-4">
+      <div
+        className="w-full overflow-y-scroll flex-1 flex flex-col p-4 gap-4"
+        ref={chatContainerRef}
+      >
         {getAllMessagesQuery.data?.length === 0 && (
           <div className="flex items-center justify-center text-sm text-gray-400">
             채팅을 시작해주세요.
