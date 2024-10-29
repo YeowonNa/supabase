@@ -27,12 +27,11 @@ export default function SignUp({ setView }) {
       if (data) {
         const { user } = data;
 
-        // // 현재 유저의 정보를 가져오기 위해 getUserInfo 호출
-        // const currentUserInfo = await getUserInfo(user.id);
-        // console.log("currentUserInfo", currentUserInfo);
+        // userProfile 테이블에 유저 정보 삽입
+        const imgurl = null;
+        const username = user.email.split("@")[0];
+        await getUserUpsert(user, imgurl, username);
 
-        // const imgurl = currentUserInfo?.imgurl || null;
-        // await getUserUpsert(user, imgurl, currentUserInfo.username);
         setConfirmationRequired(true);
       }
       if (error) {

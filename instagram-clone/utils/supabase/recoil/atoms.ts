@@ -1,12 +1,7 @@
 import { atom } from "recoil";
 
-export const searchState = atom({
-  key: "searchState",
-  default: "",
-});
-
-export const selectedIndexState = atom({
-  key: "selectedIndexState",
+export const selectedUserIdState = atom({
+  key: "selectedUserIdState",
   default: null,
 });
 
@@ -15,12 +10,17 @@ export const profileImgState = atom({
   default: "/images/defaultProfile.png",
 });
 
-export const profileUserName = atom({
-  key: "profileUserName",
-  default: "",
+export const selectedUserIndexState = atom({
+  key: "selectedUserIndexState",
+  default: 0,
 });
 
-export const profilestateMessage = atom({
-  key: "profilestateMessage",
-  default: "",
+export const presenceState = atom({
+  key: "presenceState",
+  default: null,
+});
+
+export const userState = atom({
+  key: "userState",
+  default: null,
 });

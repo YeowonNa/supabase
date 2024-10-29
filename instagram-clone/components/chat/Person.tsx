@@ -1,22 +1,33 @@
 "use client";
 
-import { getRandomImage } from "utils/supabase/randomImage";
 import TimeAgo from "javascript-time-ago";
 import ko from "javascript-time-ago/locale/ko";
+import { getRandomImage } from "utils/supabase/randomImage";
 
 TimeAgo.addDefaultLocale(ko);
 
-const timeAgo = new TimeAgo("ko-RK");
+const timeAgo = new TimeAgo("ko-KR");
 
+interface Props {
+  index: number;
+  name: string;
+  onLineAt: string;
+  isActive: boolean;
+  onChatScreen: boolean;
+  onClick?: () => void;
+  profileImg?: string;
+  userId?: string;
+}
 export default function Person({
   index,
-  userId,
   name,
   onLineAt,
+  isActive = false,
   onChatScreen = false,
   onClick = null,
-  isActive = false,
-}) {
+  profileImg,
+  userId,
+}: Props) {
   return (
     <div
       className={`flex w-full min-w-60 ${
@@ -28,16 +39,11 @@ export default function Person({
       }`}
       onClick={onClick}
     >
-      <img
-        src={getRandomImage(index)}
-        alt={name}
-        className="w-12 h-12 rounded-full"
-      />
-
+      <img src={profileImg} alt={name} className="w-10 h-10 rounded-full" />
       <div>
         <p className="text-black font-bold text-lg">{name}</p>
         <p className="text-gray-500 text-sm">
-          {timeAgo.format(Date.parse(onLineAt))}
+          {onLineAt && timeAgo.format(Date.parse(onLineAt))}
         </p>
       </div>
     </div>

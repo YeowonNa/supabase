@@ -20,7 +20,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          id: number
+          id?: number
           is_deleted?: boolean
           message: string
           receiver: string

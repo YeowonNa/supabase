@@ -3,12 +3,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { deleteFiles, upLoadFile } from "actions/storageAction";
 import React, { useEffect, useRef, useState } from "react";
-import { useRecoilState } from "recoil";
-import {
-  profileImgState,
-  profilestateMessage,
-  profileUserName,
-} from "utils/supabase/recoil/atoms";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { profileImgState, userState } from "utils/supabase/recoil/atoms";
 import getImageUrl from "utils/supabase/storage";
 import { getUserInfo, updateUserProfile } from "actions/userInfoAction";
 import { queryClient } from "config/ReactQueryClientProvider";
@@ -17,8 +13,8 @@ import { Button } from "@material-tailwind/react";
 export default function Mypage({ userInfo, isKakao }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [profileImg, setProfileImg] = useRecoilState(profileImgState);
-  const [userName, setUserName] = useRecoilState(profileUserName);
-  const [stateMessage, setStateMessage] = useRecoilState(profilestateMessage);
+  const [userName, setUserName] = useState("");
+  const [stateMessage, setStateMessage] = useState("");
 
   useEffect(() => {
     const initialImg =

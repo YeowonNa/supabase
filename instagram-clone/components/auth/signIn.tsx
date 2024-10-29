@@ -18,6 +18,10 @@ export default function SignIn({ setView }) {
           : "http://localhost:3000/auth/callback",
       },
     });
+    if (error) {
+      alert(error);
+      return;
+    }
   };
 
   const signInMutation = useMutation({
@@ -35,12 +39,12 @@ export default function SignIn({ setView }) {
       if (data) {
         const { user } = data;
 
-        // 현재 유저의 정보를 가져오기 위해 getUserInfo 호출
-        const currentUserInfo = await getUserInfo(user.id);
-        console.log("currentUserInfo", currentUserInfo);
+        // // 현재 유저의 정보를 가져오기 위해 getUserInfo 호출
+        // const currentUserInfo = await getUserInfo(user.id);
+        // console.log("user", user);
 
-        const imgurl = currentUserInfo?.imgurl || null;
-        await getUserUpsert(user, imgurl, currentUserInfo.username);
+        // const imgurl = currentUserInfo?.imgurl || null;
+        // await getUserUpsert(user, imgurl, currentUserInfo.username);
       }
     },
   });
