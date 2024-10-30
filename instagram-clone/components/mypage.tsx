@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { deleteFiles, upLoadFile } from "actions/storageAction";
 import React, { useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
-import { profileImgState } from "utils/supabase/recoil/atoms";
+import { userState } from "utils/supabase/recoil/atoms";
 import getImageUrl from "utils/supabase/storage";
 import { getUserInfo, updateUserProfile } from "actions/userInfoAction";
 import { queryClient } from "config/ReactQueryClientProvider";
@@ -12,21 +12,24 @@ import { Button } from "@material-tailwind/react";
 
 export default function Mypage({ userInfo, isKakao }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [profileImg, setProfileImg] = useRecoilState(profileImgState);
-  const [userName, setUserName] = useState("");
-  const [stateMessage, setStateMessage] = useState("");
-  console.log(userInfo);
+  const [user, setUser] = useRecoilState(userState);
+  const [userName, setUserName] = useState(user?.username || "");
+  const [stateMessage, setStateMessage] = useState(user?.statemessage || "");
+  const [profileImg, setProfileImg] = useState(
+    user?.imgurl || "/images/defaultProfile.png"
+  );
 
   useEffect(() => {
-    const initialImg =
-      isKakao && userInfo?.user_metadata?.avatar_url
-        ? userInfo?.user_metadata?.avatar_url
-        : userInfo?.imgurl
-        ? userInfo?.imgurl
-        : "/images/defaultProfile.png";
+    // const initialImg =
+    //   isKakao && userInfo?.user_metadata?.avatar_url
+    //     ? userInfo?.user_metadata?.avatar_url
+    //     : userInfo?.imgurl
+    //     ? userInfo?.imgurl
+    //     : "/images/defaultProfile.png";
 
-    setProfileImg(initialImg); // 초기 프로필 이미지 설정
-  }, [isKakao, userInfo, setProfileImg]);
+    // setProfileImg(initialImg);
+    setUser(userInfo);
+  }, [userInfo]);
 
   const handleClick = async (e) => {
     e.preventDefault();
@@ -44,13 +47,14 @@ export default function Mypage({ userInfo, isKakao }) {
 
       // userProfile 테이블에 imgurl 업데이트
       await updateUserProfile({
-        id: userInfo.id,
+        id: user?.id,
         imgurl: publicUrl,
       });
 
       // 상태 업데이트로 이미지 변경
-      const updatedUserInfo = await getUserInfo(userInfo.id);
+      const updatedUserInfo = await getUserInfo(user?.id);
       setProfileImg(updatedUserInfo.imgurl);
+      setUser(updatedUserInfo);
     },
   });
 
@@ -66,7 +70,9 @@ export default function Mypage({ userInfo, isKakao }) {
         id: userInfo.id,
         imgurl: null,
       });
+      const updatedUserInfo = await getUserInfo(user?.id);
       setProfileImg("/images/defaultProfile.png");
+      setUser(updatedUserInfo);
     },
   });
 
@@ -114,19 +120,18 @@ export default function Mypage({ userInfo, isKakao }) {
   const handleUpdateMutation = useMutation({
     mutationFn: async () => {
       const updatedUserProfile = {
-        id: userInfo?.id,
+        id: user?.id,
         username: userName,
         statemessage: stateMessage,
       };
       await updateUserProfile(updatedUserProfile);
 
       // 업데이트된 프로필 정보를 다시 가져옴
-      const updatedUserInfo = await getUserInfo(userInfo.id);
+      const updatedUserInfo = await getUserInfo(user.id);
       return updatedUserInfo;
     },
     onSuccess: (updatedUserInfo) => {
-      setUserName(updatedUserInfo.username);
-      setStateMessage(updatedUserInfo.statemessage);
+      setUser(updatedUserInfo);
     },
     onError: () => {
       alert("프로필 업데이트에 실패했습니다.");
@@ -165,23 +170,21 @@ export default function Mypage({ userInfo, isKakao }) {
 
             {!isKakao && renderIcon(profileImg)}
           </div>
-          <p className="text-xs">{userInfo?.email}</p>
+          <p className="text-xs">{user?.email}</p>
         </div>
         <div className="flex flex-col items-center mt-3 gap-2">
           <input
             type="text"
             value={userName}
             onChange={handleUserNameChange}
-            placeholder={userInfo?.username ? userInfo.username : "이름"}
+            placeholder={user?.username ? user?.username : "이름"}
             className="border-b-gray-300 border-b text-center"
           />
           <input
             type="text"
             value={stateMessage}
             onChange={handleStateMessageChange}
-            placeholder={
-              userInfo?.statemessage ? userInfo?.statemessage : "상태메시지"
-            }
+            placeholder={user?.statemessage ? user?.statemessage : "상태메시지"}
             className="border-b-gray-300 border-b text-center"
           />
         </div>

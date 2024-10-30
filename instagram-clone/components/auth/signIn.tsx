@@ -16,6 +16,7 @@ export default function SignIn({ setView }) {
         redirectTo: `https://${process.env.NEXT_PUBLIC_API_HOST}/auth/callback`,
       },
     });
+
     if (error) {
       alert(error);
       return;
@@ -32,17 +33,6 @@ export default function SignIn({ setView }) {
       if (error) {
         alert(error);
         return;
-      }
-
-      if (data) {
-        const { user } = data;
-
-        // // 현재 유저의 정보를 가져오기 위해 getUserInfo 호출
-        // const currentUserInfo = await getUserInfo(user.id);
-        // console.log("user", user);
-
-        // const imgurl = currentUserInfo?.imgurl || null;
-        // await getUserUpsert(user, imgurl, currentUserInfo.username);
       }
     },
   });

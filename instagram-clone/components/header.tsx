@@ -2,10 +2,14 @@
 
 import { AccountCircle } from "@mui/icons-material";
 import { useRecoilValue } from "recoil";
-import { profileImgState } from "utils/supabase/recoil/atoms";
+import { userState } from "utils/supabase/recoil/atoms";
 
-export default function Header({ userName, isKakao }) {
-  const profileImg = useRecoilValue(profileImgState);
+export default function Header({ isKakao }) {
+  const user = useRecoilValue(userState);
+  const email = user?.email?.split("@")?.[0];
+  const kakao = user?.email?.includes("@kakao");
+  const profileImg = user?.imgurl;
+  const userName = isKakao ? kakao : user?.username || email;
 
   return (
     <header className="w-full bg-white border-b border-solid border-gray-100 justify-start p-4">

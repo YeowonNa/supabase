@@ -16,6 +16,7 @@ export async function getUserUpsert(user, imgurl, username) {
   });
 
   if (insertError) {
+    console.error("Error updating user profile:", insertError.message);
     alert(insertError.message); // 삽입 중 에러 발생 시 출력
   } else {
     console.log("User profile updated successfully!", user);

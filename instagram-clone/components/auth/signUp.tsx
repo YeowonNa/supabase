@@ -20,20 +20,14 @@ export default function SignUp({ setView }) {
         email,
         password,
         options: {
-          emailRedirectTo: `https://${process.env.NEXT_PUBLIC_API_HOST}/signup/confirm`,
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_API_HOST}/signup/confirm`,
         },
       });
 
       if (data) {
-        const { user } = data;
-
-        // userProfile 테이블에 유저 정보 삽입
-        const imgurl = null;
-        const username = user.email.split("@")[0];
-        await getUserUpsert(user, imgurl, username);
-
         setConfirmationRequired(true);
       }
+
       if (error) {
         alert(error.message);
       }

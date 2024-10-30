@@ -1,4 +1,5 @@
 import { atom } from "recoil";
+import { UserProfile } from "type/userInfo";
 
 export const selectedUserIdState = atom({
   key: "selectedUserIdState",
@@ -20,7 +21,7 @@ export const presenceState = atom({
   default: null,
 });
 
-export const userState = atom({
+export const userState = atom<UserProfile | undefined>({
   key: "userState",
-  default: null,
+  default: undefined,
 });

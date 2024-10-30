@@ -25,7 +25,7 @@ export default function Person({
 }: Props) {
   return (
     <div
-      className={`flex w-full min-w-60 ${
+      className={`flex w-full min-w-60  ${
         onClick && "cursor-pointer"
       } gap-4 items-center p-4 ${
         !onChatScreen && isActive && "bg-light-blue-50"

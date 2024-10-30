@@ -2,12 +2,15 @@
 
 import { Home, Logout, People, Search, Send } from "@mui/icons-material";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "utils/supabase/client";
 
 export default function SiderBar() {
+  const router = useRouter();
   const supabase = createBrowserSupabaseClient();
   const onClickHandle = async () => {
     supabase.auth.signOut();
+    router.push("/");
   };
 
   return (
