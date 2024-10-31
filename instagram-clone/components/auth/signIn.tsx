@@ -48,7 +48,7 @@ export default function SignIn({ setView }) {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 h-screen items-center justify-center">
       <div className="pt-10 pb-6 px-10 w-full flex flex-col items-center justify-center max-w-lg border border-gray-400 bg-white gap-2">
         <img src={`/images/inflearngram.png`} className="w-60 mb-6" />
         <Input

@@ -18,8 +18,7 @@ export default async function Home() {
   const userInfo = isKakao ? user : await getUserInfo(user?.id);
 
   return (
-    <main className="w-full h-screen flex flex-col items-center">
-      <Header isKakao={isKakao} />
+    <main className="w-full h-full flex flex-col items-center">
       <Mypage userInfo={userInfo} isKakao={isKakao} />
     </main>
   );

@@ -150,7 +150,7 @@ export default function ChatScreen({}) {
 
   const data = selectedUserQuery.data;
   return data !== null ? (
-    <div className="w-full h-screen flex flex-col">
+    <div className="w-full h-full flex flex-col">
       {/* Active 유저 영역 */}
       <Person
         isActive={false}
@@ -181,21 +181,24 @@ export default function ChatScreen({}) {
       </div>
 
       {/* 채팅창 영역 */}
-      <div className="flex pb-[42px]">
+      <div className="flex pb-14 px-5">
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="p-3 w-full border-2 border-light-blue-600"
+          className="py-2 px-3 w-full bg-gray-200 rounded-lg border border-solid border-transparent focus:border-gray-600 shadow-lg text-sm"
           placeholder="메시지를 입력하세요."
           onKeyDown={(e) => handleKeyDown(e)}
         />
 
         <button
           onClick={handleClick}
-          className="min-w-20 p-3 bg-light-blue-600 text-white"
-          color="light-blue"
+          className="min-w-max py-2 px-4 ml-2 flex-grow-0 rounded-lg bg-light-blue-600 text-white shadow-lg hover:bg-light-blue-800 transition-all"
         >
-          {sendMessageMutation.isPending ? <Spinner /> : <span>전송</span>}
+          {sendMessageMutation.isPending ? (
+            <Spinner />
+          ) : (
+            <span className="inline-block text-sm ">전송</span>
+          )}
         </button>
       </div>
     </div>

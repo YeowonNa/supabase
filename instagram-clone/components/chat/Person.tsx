@@ -14,6 +14,8 @@ interface Props {
   onChatScreen: boolean;
   onClick?: () => void;
   profileImg?: string;
+  isList?: boolean;
+  statusMsg?: string;
 }
 export default function Person({
   name,
@@ -22,24 +24,38 @@ export default function Person({
   onChatScreen = false,
   onClick = null,
   profileImg,
+  isList,
+  statusMsg,
 }: Props) {
   return (
     <div
-      className={`flex w-full min-w-60  ${
+      className={`flex w-full ${
         onClick && "cursor-pointer"
-      } gap-4 items-center p-4 ${
-        !onChatScreen && isActive && "bg-light-blue-50"
-      } ${!onChatScreen && !isActive && "bg-gray-50"} ${
-        onChatScreen && "bg-gray-50"
+      } gap-2 items-center ${!onChatScreen && isActive && "bg-light-blue-50"} ${
+        !onChatScreen && !isActive && "bg-gray-50"
+      } ${onChatScreen ? "bg-gray-50" : ""} ${
+        isList ? "flex-col" : "flex-row p-3"
       }`}
       onClick={onClick}
     >
-      <img src={profileImg} alt={name} className="w-10 h-10 rounded-full" />
-      <div>
+      <img
+        src={profileImg}
+        alt={name}
+        className={`rounded-full object-cover ${
+          isList ? "w-16 h-16" : "w-10 h-10"
+        }`}
+      />
+      <div className="flex flex-col items-center justify-center h-12">
         <p className="text-black font-bold text-lg">{name}</p>
-        <p className="text-gray-500 text-sm">
-          {onLineAt && timeAgo.format(Date.parse(onLineAt))}
-        </p>
+        {isList && statusMsg ? (
+          <p className="text-gray-500 text-xs mt-1 h-8 text-center">
+            {statusMsg}
+          </p>
+        ) : (
+          <p className="text-gray-500 text-sm">
+            {onLineAt && timeAgo.format(Date.parse(onLineAt))}
+          </p>
+        )}
       </div>
     </div>
   );

@@ -111,7 +111,7 @@ export default function ChatPeopleList({ loggedInUser }) {
   }, [loggedInUser.id]);
 
   return (
-    <div className="h-screen min-w-60 flex flex-col bg-gray-50">
+    <div className="min-w-60 flex flex-col bg-gray-50 border-r border-solid">
       {chatUsersError && (
         <div>채팅 사용자 정보를 불러오는 중 오류가 발생했습니다.</div>
       )}

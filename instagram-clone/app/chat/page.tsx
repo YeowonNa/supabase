@@ -8,7 +8,7 @@ export default async function ChatPate() {
     data: { user },
   } = await supabase.auth.getUser();
   return (
-    <div className="w-full h-screen flex items-center justify-center">
+    <div className="w-full h-full flex">
       <ChatPeopleList loggedInUser={user} />
       <ChatScreen />
     </div>

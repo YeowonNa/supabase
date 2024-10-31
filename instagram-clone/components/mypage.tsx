@@ -16,19 +16,22 @@ export default function Mypage({ userInfo, isKakao }) {
   const [userName, setUserName] = useState(user?.username || "");
   const [stateMessage, setStateMessage] = useState(user?.statemessage || "");
   const [profileImg, setProfileImg] = useState(
-    user?.imgurl || "/images/defaultProfile.png"
+    user?.imgurl ||
+      user?.user_metadata?.avatar_url ||
+      "/images/defaultProfile.png"
   );
 
   useEffect(() => {
-    // const initialImg =
-    //   isKakao && userInfo?.user_metadata?.avatar_url
-    //     ? userInfo?.user_metadata?.avatar_url
-    //     : userInfo?.imgurl
-    //     ? userInfo?.imgurl
-    //     : "/images/defaultProfile.png";
-
-    // setProfileImg(initialImg);
-    setUser(userInfo);
+    if (userInfo) {
+      setUser(userInfo);
+      setUserName(userInfo.username || ""); // username 초기화
+      setStateMessage(userInfo.statemessage || ""); // stateMessage 초기화
+      setProfileImg(
+        userInfo.imgurl ||
+          userInfo.user_metadata?.avatar_url ||
+          "/images/defaultProfile.png"
+      );
+    }
   }, [userInfo]);
 
   const handleClick = async (e) => {
@@ -49,6 +52,8 @@ export default function Mypage({ userInfo, isKakao }) {
       await updateUserProfile({
         id: user?.id,
         imgurl: publicUrl,
+        username: userName,
+        statemessage: stateMessage,
       });
 
       // 상태 업데이트로 이미지 변경
@@ -69,6 +74,8 @@ export default function Mypage({ userInfo, isKakao }) {
       await updateUserProfile({
         id: userInfo.id,
         imgurl: null,
+        username: userName,
+        statemessage: stateMessage,
       });
       const updatedUserInfo = await getUserInfo(user?.id);
       setProfileImg("/images/defaultProfile.png");
@@ -113,7 +120,9 @@ export default function Mypage({ userInfo, isKakao }) {
     setUserName(e.target.value);
   };
 
-  const handleStateMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleStateMessageChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ) => {
     setStateMessage(e.target.value);
   };
 
@@ -142,11 +151,14 @@ export default function Mypage({ userInfo, isKakao }) {
     if (userName.trim() !== "" || stateMessage.trim() !== "") {
       handleUpdateMutation.mutate();
     }
+    if (isKakao) {
+      alert("카카오톡 내에서 변경해주세요.");
+    }
   };
 
   return (
-    <div className="w-full h-screen bg-blue-gray-50 flex px-10 py-8 items-center justify-center">
-      <div className="w-1/3 h-60 flex flex-col">
+    <div className="w-full h-full bg-blue-gray-50 flex px-10 py-8 items-center justify-center">
+      <div className="w-fit flex flex-col border border-solid border-gray-300 bg-white p-8 rounded-md shadow-md">
         <div className="flex flex-col items-center gap-3">
           <div className="relative">
             {!isKakao && (
@@ -170,22 +182,22 @@ export default function Mypage({ userInfo, isKakao }) {
 
             {!isKakao && renderIcon(profileImg)}
           </div>
-          <p className="text-xs">{user?.email}</p>
+          <p className="text-xs h-4">{user?.email}</p>
         </div>
         <div className="flex flex-col items-center mt-3 gap-2">
           <input
             type="text"
             value={userName}
             onChange={handleUserNameChange}
-            placeholder={user?.username ? user?.username : "이름"}
-            className="border-b-gray-300 border-b text-center"
+            placeholder={user?.username || "이름"}
+            className="w-56 border border-solid border-gray-400 text-center text-sm py-1 rounded-lg"
           />
-          <input
-            type="text"
+          <textarea
             value={stateMessage}
             onChange={handleStateMessageChange}
-            placeholder={user?.statemessage ? user?.statemessage : "상태메시지"}
-            className="border-b-gray-300 border-b text-center"
+            maxLength={20}
+            placeholder={user?.statemessage || "상태메시지"}
+            className="w-56 border border-solid border-gray-400 text-center text-sm py-1 px-1 resize-none rounded-lg"
           />
         </div>
         <Button

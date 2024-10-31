@@ -2,7 +2,7 @@
 
 export default function DiscoverPate() {
   return (
-    <div className="w-full h-screen flex items-center justify-center">
+    <div className="w-full   flex items-center justify-center">
       discover page
     </div>
   );

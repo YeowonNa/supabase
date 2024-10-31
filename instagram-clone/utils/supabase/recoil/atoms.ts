@@ -1,5 +1,4 @@
-import { atom } from "recoil";
-import { UserProfile } from "type/userInfo";
+import { atom, selector } from "recoil";
 
 export const selectedUserIdState = atom({
   key: "selectedUserIdState",
@@ -21,7 +20,15 @@ export const presenceState = atom({
   default: null,
 });
 
-export const userState = atom<UserProfile | undefined>({
+export const userState = atom({
   key: "userState",
   default: undefined,
+});
+
+export const userStateWithLocalStorage = selector({
+  key: "userStateWithLocalStorage",
+  get: () => {
+    const user = localStorage.getItem("user");
+    return user ? JSON.parse(user) : null;
+  },
 });
