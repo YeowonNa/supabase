@@ -1,5 +1,4 @@
 import { createClient } from "@supabase/supabase-js";
-import { UserProfile } from "type/userInfo";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -42,7 +41,7 @@ export async function getUserInfo(id: string) {
  * @param formData
  * @desc userProfile 테이블에 imgurl 업데이트
  */
-export async function updateUserProfile(user: UserProfile) {
+export async function updateUserProfile(user) {
   try {
     const { error: updateError } = await supabase
       .from("userProfile")

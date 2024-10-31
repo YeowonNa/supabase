@@ -2,7 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { deleteFiles, upLoadFile } from "actions/storageAction";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import { userState } from "utils/supabase/recoil/atoms";
 import getImageUrl from "utils/supabase/storage";
@@ -17,23 +17,9 @@ export default function Mypage({ userInfo, isKakao }) {
   const [stateMessage, setStateMessage] = useState(user?.statemessage || "");
   const [profileImg, setProfileImg] = useState(
     user?.imgurl ||
-      user?.user_metadata?.avatar_url ||
+      userInfo?.user_metadata?.avatar_url ||
       "/images/defaultProfile.png"
   );
-
-  useEffect(() => {
-    if (userInfo) {
-      setUser(userInfo);
-      setUserName(userInfo.username || ""); // username 초기화
-      setStateMessage(userInfo.statemessage || ""); // stateMessage 초기화
-      setProfileImg(
-        userInfo.imgurl ||
-          userInfo.user_metadata?.avatar_url ||
-          "/images/defaultProfile.png"
-      );
-    }
-  }, [userInfo]);
-
   const handleClick = async (e) => {
     e.preventDefault();
     if (!isKakao) {
@@ -48,18 +34,7 @@ export default function Mypage({ userInfo, isKakao }) {
       const file = variables.get("file") as File;
       const publicUrl = getImageUrl(file.name);
 
-      // userProfile 테이블에 imgurl 업데이트
-      await updateUserProfile({
-        id: user?.id,
-        imgurl: publicUrl,
-        username: userName,
-        statemessage: stateMessage,
-      });
-
-      // 상태 업데이트로 이미지 변경
-      const updatedUserInfo = await getUserInfo(user?.id);
-      setProfileImg(updatedUserInfo.imgurl);
-      setUser(updatedUserInfo);
+      setProfileImg(publicUrl);
     },
   });
 
@@ -70,16 +45,7 @@ export default function Mypage({ userInfo, isKakao }) {
       queryClient.invalidateQueries({
         queryKey: ["images"],
       });
-
-      await updateUserProfile({
-        id: userInfo.id,
-        imgurl: null,
-        username: userName,
-        statemessage: stateMessage,
-      });
-      const updatedUserInfo = await getUserInfo(user?.id);
       setProfileImg("/images/defaultProfile.png");
-      setUser(updatedUserInfo);
     },
   });
 
@@ -147,11 +113,46 @@ export default function Mypage({ userInfo, isKakao }) {
     },
   });
 
-  const handleUpdate = () => {
-    if (userName.trim() !== "" || stateMessage.trim() !== "") {
-      handleUpdateMutation.mutate();
-    }
-    if (isKakao) {
+  const handleUpdate = async () => {
+    if ((!isKakao && userName.trim() !== "") || stateMessage.trim() !== "") {
+      try {
+        let finalImageUrl = profileImg;
+        if (profileImg === "/images/defaultProfile.png") {
+          finalImageUrl = null;
+        }
+
+        // DB 업데이트
+        await updateUserProfile({
+          id: user?.id,
+          imgurl: finalImageUrl,
+          username: userName,
+          statemessage: stateMessage,
+        });
+
+        // 최신 정보 가져오기
+        const updatedUserInfo = await getUserInfo(user?.id);
+
+        if (updatedUserInfo) {
+          // Recoil 상태 업데이트
+          setUser(updatedUserInfo);
+
+          // 로컬 상태 업데이트
+          const newImageUrl =
+            updatedUserInfo.imgurl === null
+              ? "/images/defaultProfile.png"
+              : updatedUserInfo.imgurl;
+
+          setProfileImg(newImageUrl);
+          setUserName(updatedUserInfo.username || "");
+          setStateMessage(updatedUserInfo.statemessage || "");
+        }
+
+        alert("프로필이 성공적으로 업데이트되었습니다.");
+      } catch (error) {
+        console.error("프로필 업데이트 중 에러 발생:", error);
+        alert("프로필 업데이트에 실패했습니다.");
+      }
+    } else if (isKakao) {
       alert("카카오톡 내에서 변경해주세요.");
     }
   };
