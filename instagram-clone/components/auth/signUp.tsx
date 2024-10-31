@@ -66,7 +66,7 @@ export default function SignUp({ setView }) {
         </Button>
       </div>
 
-      <div className="py-4 w-full text-center max-w-lg border border-gray-400 bg-white">
+      <div className="py-4 w-full text-center text-sm max-w-lg border border-gray-400 bg-white">
         이미 계정이 있으신가요?
         <button
           className="text-light-blue-600 font-bold pl-1"

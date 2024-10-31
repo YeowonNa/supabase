@@ -1,6 +1,5 @@
 import { Button, Input } from "@material-tailwind/react";
 import { useMutation } from "@tanstack/react-query";
-import { getUserInfo, getUserUpsert } from "actions/userInfoAction";
 import { useState } from "react";
 import { createBrowserSupabaseClient } from "utils/supabase/client";
 
@@ -13,7 +12,7 @@ export default function SignIn({ setView }) {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "kakao",
       options: {
-        redirectTo: `https://${process.env.NEXT_PUBLIC_API_HOST}/auth/callback`,
+        redirectTo: `${process.env.NEXT_PUBLIC_API_HOST}/auth/callback`,
       },
     });
 
@@ -85,7 +84,7 @@ export default function SignIn({ setView }) {
         </div>
       </div>
 
-      <div className="py-4 w-full text-center max-w-lg border border-gray-400 bg-white">
+      <div className="py-4 w-full text-center text-sm max-w-lg border border-gray-400 bg-white">
         아직 계정이 없으신가요?
         <button
           className="text-light-blue-600 font-bold pl-1"
