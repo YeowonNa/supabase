@@ -3,7 +3,7 @@
 import TimeAgo from "javascript-time-ago";
 import ko from "javascript-time-ago/locale/ko";
 
-TimeAgo.addDefaultLocale(ko);
+TimeAgo.addLocale(ko);
 
 const timeAgo = new TimeAgo("ko-KR");
 
@@ -48,7 +48,7 @@ export default function Person({
       />
       <div className="flex flex-col items-center justify-center h-12">
         <p className="text-black font-bold text-lg">{name}</p>
-        {isList && statusMsg ? (
+        {isList ? (
           <p className="text-gray-500 text-xs mt-1 h-8 text-center">
             {statusMsg}
           </p>

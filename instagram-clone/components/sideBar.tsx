@@ -6,8 +6,13 @@ import { createBrowserSupabaseClient } from "utils/supabase/client";
 
 export default function SiderBar() {
   const supabase = createBrowserSupabaseClient();
-  const onClickHandle = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("로그아웃 중 오류가 발생했습니다:", error.message);
+    } else {
+      console.log("로그아웃 성공");
+    }
   };
 
   return (
@@ -30,7 +35,7 @@ export default function SiderBar() {
 
       {/* logout button */}
       <div>
-        <button onClick={onClickHandle}>
+        <button onClick={handleLogout}>
           <Logout className="text-2xl text-deep-purple-900" />
         </button>
       </div>
