@@ -2,7 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { deleteFiles, upLoadFile } from "actions/storageAction";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRecoilState } from "recoil";
 import { userState } from "utils/supabase/recoil/atoms";
 import getImageUrl from "utils/supabase/storage";
@@ -10,16 +10,15 @@ import { getUserInfo, updateUserProfile } from "actions/userInfoAction";
 import { queryClient } from "config/ReactQueryClientProvider";
 import { Button } from "@material-tailwind/react";
 
-export default function Mypage({ userInfo, isKakao }) {
+export default function Mypage({ isKakao }) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [user, setUser] = useRecoilState(userState);
   const [userName, setUserName] = useState(user?.username || "");
   const [stateMessage, setStateMessage] = useState(user?.statemessage || "");
   const [profileImg, setProfileImg] = useState(
-    user?.imgurl ||
-      userInfo?.user_metadata?.avatar_url ||
-      "/images/defaultProfile.png"
+    user?.imgurl || "/images/defaultProfile.png"
   );
+
   const handleClick = async (e) => {
     e.preventDefault();
     if (!isKakao) {
@@ -70,7 +69,7 @@ export default function Mypage({ userInfo, isKakao }) {
         </div>
       );
     } else {
-      const fileName = userInfo?.imgurl?.split("/").pop() || "";
+      const fileName = user?.imgurl?.split("/").pop() || "";
       return (
         <div
           className="absolute top-0 right-0 rounded-full border border-solid border-gray-100 bg-gray-100 w-7 h-7 flex items-center justify-center cursor-pointer"
@@ -114,7 +113,7 @@ export default function Mypage({ userInfo, isKakao }) {
   });
 
   const handleUpdate = async () => {
-    if ((!isKakao && userName.trim() !== "") || stateMessage.trim() !== "") {
+    if (!isKakao) {
       try {
         let finalImageUrl = profileImg;
         if (profileImg === "/images/defaultProfile.png") {
@@ -189,6 +188,7 @@ export default function Mypage({ userInfo, isKakao }) {
           <input
             type="text"
             value={userName}
+            maxLength={10}
             onChange={handleUserNameChange}
             placeholder={user?.username || "이름"}
             className="w-56 border border-solid border-gray-400 text-center text-sm py-1 rounded-lg"

@@ -22,7 +22,7 @@ export const presenceState = atom({
 
 export const userState = atom({
   key: "userState",
-  default: undefined,
+  default: null,
 });
 
 export const userStateWithLocalStorage = selector({

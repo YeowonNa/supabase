@@ -41,9 +41,9 @@ export default function ChatPeopleList({ loggedInUser }) {
   const router = useRouter();
 
   const { data: chatUsers = [], error: chatUsersError } = useQuery({
-    queryKey: ["chatUsers", loggedInUser.id],
-    queryFn: async () => await getChatUsers(loggedInUser.id),
-    enabled: !!loggedInUser.id, // 로그인한 사용자 ID가 있을 때만 실행
+    queryKey: ["chatUsers", loggedInUser?.id],
+    queryFn: async () => await getChatUsers(loggedInUser?.id),
+    enabled: !!loggedInUser?.id, // 로그인한 사용자 ID가 있을 때만 실행
   });
 
   const { data: allUsers = [] } = useQuery({
@@ -59,11 +59,13 @@ export default function ChatPeopleList({ loggedInUser }) {
 
   // 필터링된 유저목록
   const filteredUsers = allUsers.filter((user) => {
-    const isNotLoggedInUser = user.id.toString() !== loggedInUser.id.toString();
+    const isNotLoggedInUser =
+      user?.id.toString() !== loggedInUser?.id.toString();
     const isChattingUser = chatUsers.some(
-      (chatUser) => chatUser.receiver === user.id || chatUser.sender === user.id
+      (chatUser) =>
+        chatUser.receiver === user.id || chatUser.sender === user?.id
     );
-    const isSelectedUser = user.id.toString() === userIdFromQuery; // 쿼리 파라미터에서 가져온 유저 ID와 비교
+    const isSelectedUser = user?.id.toString() === userIdFromQuery; // 쿼리 파라미터에서 가져온 유저 ID와 비교
     return isNotLoggedInUser && (isChattingUser || isSelectedUser); // 나와 채팅 기록이 있는 유저만 반환
   });
 
@@ -84,7 +86,7 @@ export default function ChatPeopleList({ loggedInUser }) {
     const channel = supabase.channel("online_users", {
       config: {
         presence: {
-          key: loggedInUser.id,
+          key: loggedInUser?.id,
         },
       },
     });
@@ -108,7 +110,7 @@ export default function ChatPeopleList({ loggedInUser }) {
     return () => {
       channel.unsubscribe();
     };
-  }, [loggedInUser.id]);
+  }, [loggedInUser?.id]);
 
   return (
     <div className="min-w-60 flex flex-col bg-gray-50 border-r border-solid">
@@ -119,7 +121,7 @@ export default function ChatPeopleList({ loggedInUser }) {
         <Person
           key={user.id}
           isActive={selectedUserId === user.id}
-          name={user.username || user.email.split("@")[0]}
+          name={user?.username || user?.email.split("@")[0]}
           onChatScreen={false}
           onClick={() => onClickHandler(user.id)}
           onLineAt={presence?.[user.id]?.[0]?.onLineAt}

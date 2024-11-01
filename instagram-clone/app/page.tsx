@@ -1,5 +1,3 @@
-import { getUserInfo } from "actions/userInfoAction";
-import Header from "components/header";
 import Mypage from "components/mypage";
 import { createServerSupabaseClient } from "utils/supabase/server";
 
@@ -15,11 +13,11 @@ export default async function Home() {
   } = await supabase.auth.getUser();
 
   const isKakao = user?.app_metadata.provider === "kakao" ? true : false;
-  const userInfo = isKakao ? user : await getUserInfo(user?.id);
+  // const userInfo = isKakao ? user : await getUserInfo(user?.id);
 
   return (
     <main className="w-full h-full flex flex-col items-center">
-      <Mypage userInfo={userInfo} isKakao={isKakao} />
+      <Mypage isKakao={isKakao} />
     </main>
   );
 }

@@ -8,6 +8,7 @@ import MainLayout from "components/layouts/main-layout";
 import Auth from "components/auth";
 import { createServerSupabaseClient } from "utils/supabase/server";
 import AuthProvider from "config/auth-provider";
+import { getUserInfo } from "actions/userInfoAction";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +23,7 @@ export default async function RootLayout({ children }) {
   const {
     data: { session },
   } = await supabase.auth.getSession();
+  const userInfo = await getUserInfo(session?.user?.id);
 
   return (
     <html lang="en">
@@ -36,7 +38,7 @@ export default async function RootLayout({ children }) {
       </head>
 
       <body className={inter.className}>
-        <RecoilProvider>
+        <RecoilProvider initialUserInfo={userInfo}>
           <ReactQueryClientProvider>
             <ThemeProvider>
               <AuthProvider accessToken={session?.access_token}>

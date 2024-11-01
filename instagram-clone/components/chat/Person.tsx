@@ -32,8 +32,9 @@ export default function Person({
       className={`flex w-full ${
         onClick && "cursor-pointer"
       } gap-2 items-center ${!onChatScreen && isActive && "bg-light-blue-50"} ${
-        !onChatScreen && !isActive && "bg-gray-50"
-      } ${onChatScreen ? "bg-gray-50" : ""} ${
+        !onChatScreen && !isActive && !isList && "bg-gray-50"
+      }
+       ${onChatScreen ? "bg-gray-50" : ""} ${
         isList ? "flex-col" : "flex-row p-3"
       }`}
       onClick={onClick}
