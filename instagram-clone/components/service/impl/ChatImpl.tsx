@@ -4,7 +4,7 @@ import { useRecoilState } from "recoil";
 import { createBrowserSupabaseClient } from "utils/supabase/client";
 import { selectedUserIndexState } from "utils/supabase/recoil/atoms";
 import { useEffect } from "react";
-import { User } from "type";
+import { Message, User } from "type";
 import { useQuery } from "@tanstack/react-query";
 import { queryClient } from "config/ReactQueryClientProvider";
 
@@ -55,9 +55,11 @@ export default function ChatImpl(param: ChatItemProps) {
   const filteredUsers = allUserData?.filter((users) => {
     const isNotLoggedInUser = user?.id.toString() !== users?.id.toString();
     const isChattingUser = chatUsers.some(
-      (chatUser) =>
-        chatUser.receiver === user?.id || chatUser.sender === user?.id
+      (chatUser: Message) =>
+        (chatUser.receiver === users.id && chatUser.sender === user?.id) ||
+        (chatUser.sender === users.id && chatUser.receiver === user?.id)
     );
+
     const isSelectedUser = user?.id.toString() === userIdFromQuery; // 쿼리 파라미터에서 가져온 유저 ID와 비교
     return isNotLoggedInUser && (isChattingUser || isSelectedUser); // 나와 채팅 기록이 있는 유저만 반환
   });
