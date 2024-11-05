@@ -32,7 +32,7 @@ export async function getAllUsers() {
   return data.users;
 }
 
-export async function getUserById(userId) {
+export async function getUserById(userId: string) {
   const supabase = await createServerSupabaseAdminClient();
 
   const { data, error } = await supabase.auth.admin.getUserById(userId);

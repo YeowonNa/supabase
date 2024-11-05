@@ -3,150 +3,23 @@
 import { Spinner } from "@material-tailwind/react";
 import Person from "./Person";
 import Message from "./Message";
-import { useRecoilValue } from "recoil";
 
-import { useEffect, useRef, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { createBrowserSupabaseClient } from "utils/supabase/client";
-import {
-  presenceState,
-  selectedUserIdState,
-} from "utils/supabase/recoil/atoms";
 import { formatDateTime } from "utils/formattedDateTime";
-import { getUserInfo } from "actions/userInfoAction";
+import { ChatItemProps } from "components/service/chat/ChatService";
+import { KeyboardEvent } from "react";
 
-export async function sendMessage({ message, chatUserId }) {
-  const supabase = createBrowserSupabaseClient();
-
+export default function ChatScreen({ ...props }: ChatItemProps) {
+  const { fetchChatScreen, presence, selectedUserId } = props;
   const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    throw new Error("User is not authenticated");
-  }
-
-  const { data, error: sendMessageError } = await supabase
-    .from("message")
-    .insert({
-      message,
-      receiver: chatUserId,
-      sender: user.id,
-    });
-
-  if (sendMessageError) {
-    throw new Error(sendMessageError.message);
-  }
-
-  return data;
-}
-
-export async function getAllMessages({ chatUserId }) {
-  const supabase = createBrowserSupabaseClient();
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession();
-
-  if (error || !session.user) {
-    throw new Error("User is not authenticated");
-  }
-
-  const { data, error: getMessagesError } = await supabase
-    .from("message")
-    .select("*")
-    .or(`receiver.eq.${chatUserId},receiver.eq.${session.user.id}`)
-    .or(`sender.eq.${chatUserId},sender.eq.${session.user.id}`)
-    .order("created_at", { ascending: true });
-
-  if (getMessagesError) {
-    console.log(getMessagesError);
-  }
-
-  return data;
-}
-
-export default function ChatScreen({}) {
-  const selectedUserId = useRecoilValue(selectedUserIdState);
-  const [message, setMessage] = useState("");
-  const supabase = createBrowserSupabaseClient();
-  const presence = useRecoilValue(presenceState);
-  const chatContainerRef = useRef(null);
-
-  let lastOnLineAt = null; // 마지막 onLineAt을 저장할 변수
-  let lastIsFromMe = null; // 마지막 isFromMe 상태를 저장할 변수
-
-  const selectedUserQuery = useQuery({
-    queryKey: ["user", selectedUserId],
-    queryFn: async () => {
-      if (selectedUserId) {
-        return await getUserInfo(selectedUserId);
-      }
-      return null;
-    },
-  });
-
-  const sendMessageMutation = useMutation({
-    mutationFn: async () => {
-      return sendMessage({
-        message,
-        chatUserId: selectedUserId,
-      });
-    },
-    onSuccess: () => {
-      setMessage("");
-      getAllMessagesQuery.refetch();
-    },
-  });
-
-  const getAllMessagesQuery = useQuery({
-    queryKey: ["messages", selectedUserId],
-    queryFn: () =>
-      selectedUserId !== null && getAllMessages({ chatUserId: selectedUserId }),
-  });
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("message_postgres_changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "message",
-        },
-        (payload) => {
-          if (payload.eventType === "INSERT" && !payload.errors) {
-            getAllMessagesQuery.refetch();
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
-    }
-  }, [getAllMessagesQuery.data]);
-
-  const handleClick = () => {
-    if (message.trim() !== "") {
-      sendMessageMutation.mutate();
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleClick();
-    }
-  };
+    chatContainerRef,
+    getAllMessagesQuery,
+    handleClick,
+    handleKeyDown,
+    message,
+    selectedUserQuery,
+    sendMessageMutation,
+    setMessage,
+  } = fetchChatScreen(props);
 
   const data = selectedUserQuery.data;
   return data !== null ? (
@@ -154,7 +27,7 @@ export default function ChatScreen({}) {
       {/* Active 유저 영역 */}
       <Person
         isActive={false}
-        name={data?.username ? data.username : data?.email?.split("@")?.[0]}
+        name={data?.username || data?.email?.split("@")?.[0]}
         onChatScreen={true}
         onLineAt={presence?.[selectedUserId]?.[0]?.onLineAt}
         profileImg={data?.imgurl ? data.imgurl : "/images/defaultProfile.png"}
@@ -187,7 +60,7 @@ export default function ChatScreen({}) {
           onChange={(e) => setMessage(e.target.value)}
           className="py-2 px-3 w-full bg-gray-200 rounded-lg border border-solid border-transparent focus:border-gray-600 shadow-lg text-sm"
           placeholder="메시지를 입력하세요."
-          onKeyDown={(e) => handleKeyDown(e)}
+          onKeyDown={(e: KeyboardEvent) => handleKeyDown(e)}
         />
 
         <button
